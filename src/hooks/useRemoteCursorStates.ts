@@ -1,28 +1,24 @@
+import { useCallback } from 'react';
 import { CursorState } from '@slate-yjs/core';
-import { useSyncExternalStore } from 'use-sync-external-store/shim';
-import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector';
 import { useRemoteCursorStateStore } from './useRemoteCursorStateStore';
+import { useStore } from './useStore';
 
 export function useRemoteCursorStates<
   TCursorData extends Record<string, unknown> = Record<string, unknown>
 >() {
-  const [subscribe, getSnapshot] = useRemoteCursorStateStore<TCursorData>();
-  return useSyncExternalStore(subscribe, getSnapshot);
+  const store = useRemoteCursorStateStore<TCursorData>();
+  return useStore(
+    store,
+    useCallback((cursors) => cursors, [])
+  );
 }
 
 export function useRemoteCursorStatesSelector<
   TCursorData extends Record<string, unknown> = Record<string, unknown>,
   TSelection = unknown
 >(
-  selector: (cursors: Record<string, CursorState<TCursorData>>) => TSelection,
-  isEqual?: (a: TSelection, b: TSelection) => boolean
+  selector: (cursors: Record<string, CursorState<TCursorData>>) => TSelection
 ): TSelection {
-  const [subscribe, getSnapshot] = useRemoteCursorStateStore<TCursorData>();
-  return useSyncExternalStoreWithSelector(
-    subscribe,
-    getSnapshot,
-    null,
-    selector,
-    isEqual
-  );
+  const store = useRemoteCursorStateStore<TCursorData>();
+  return useStore(store, selector);
 }
