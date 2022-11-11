@@ -60,7 +60,7 @@ __export(src_exports, {
 module.exports = __toCommonJS(src_exports);
 
 // src/hooks/useDecorateRemoteCursors.ts
-var import_react = require("react");
+var import_react3 = require("react");
 var import_slate = require("slate");
 
 // src/utils/getCursorRange.ts
@@ -95,8 +95,7 @@ function useRemoteCursorEditor() {
 }
 
 // src/hooks/useRemoteCursorStates.ts
-var import_shim = require("use-sync-external-store/shim");
-var import_with_selector = require("use-sync-external-store/shim/with-selector");
+var import_react2 = require("react");
 
 // src/hooks/useRemoteCursorStateStore.ts
 var import_core3 = require("@slate-yjs/core");
@@ -158,14 +157,28 @@ function useRemoteCursorStateStore() {
   return getCursorStateStore(editor);
 }
 
+// src/hooks/useStore.ts
+var import_react = require("react");
+function useStore(store, selector) {
+  const [subscribe, getSnapshot] = store;
+  const [state, setState] = (0, import_react.useState)(() => selector(getSnapshot()));
+  (0, import_react.useEffect)(() => {
+    const callback = () => setState(selector(getSnapshot()));
+    const unsubscribe = subscribe(callback);
+    callback();
+    return unsubscribe;
+  }, [subscribe, getSnapshot, selector]);
+  return state;
+}
+
 // src/hooks/useRemoteCursorStates.ts
 function useRemoteCursorStates() {
-  const [subscribe, getSnapshot] = useRemoteCursorStateStore();
-  return (0, import_shim.useSyncExternalStore)(subscribe, getSnapshot);
+  const store = useRemoteCursorStateStore();
+  return useStore(store, (0, import_react2.useCallback)((cursors) => cursors, []));
 }
-function useRemoteCursorStatesSelector(selector, isEqual) {
-  const [subscribe, getSnapshot] = useRemoteCursorStateStore();
-  return (0, import_with_selector.useSyncExternalStoreWithSelector)(subscribe, getSnapshot, null, selector, isEqual);
+function useRemoteCursorStatesSelector(selector) {
+  const store = useRemoteCursorStateStore();
+  return useStore(store, selector);
 }
 
 // src/hooks/useDecorateRemoteCursors.ts
@@ -191,9 +204,9 @@ function getDecoration(clientId, state, range, caret) {
 function useDecorateRemoteCursors({ carets = true } = {}) {
   const editor = useRemoteCursorEditor();
   const cursors = useRemoteCursorStates();
-  const cursorsRef = (0, import_react.useRef)(cursors);
+  const cursorsRef = (0, import_react3.useRef)(cursors);
   cursorsRef.current = cursors;
-  return (0, import_react.useCallback)((entry) => {
+  return (0, import_react3.useCallback)((entry) => {
     const [, path] = entry;
     if (path.length !== 0) {
       return [];
@@ -219,12 +232,12 @@ function useDecorateRemoteCursors({ carets = true } = {}) {
 
 // src/hooks/useUnsetCursorPositionOnBlur.ts
 var import_core4 = require("@slate-yjs/core");
-var import_react2 = require("react");
+var import_react4 = require("react");
 var import_slate_react2 = require("slate-react");
 function useUnsetCursorPositionOnBlur() {
   const editor = useRemoteCursorEditor();
   const isSlateFocused = (0, import_slate_react2.useFocused)();
-  const sendCursorPosition = (0, import_react2.useCallback)((isFocused) => {
+  const sendCursorPosition = (0, import_react4.useCallback)((isFocused) => {
     if (isFocused && editor.selection) {
       import_core4.CursorEditor.sendCursorPosition(editor, editor.selection);
       return;
@@ -233,7 +246,7 @@ function useUnsetCursorPositionOnBlur() {
       import_core4.CursorEditor.sendCursorPosition(editor, null);
     }
   }, [editor]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     const handleWindowBlur = () => {
       if (isSlateFocused) {
         sendCursorPosition(false);
@@ -251,13 +264,13 @@ function useUnsetCursorPositionOnBlur() {
       window.removeEventListener("focus", handleWindowFocus);
     };
   }, [isSlateFocused, sendCursorPosition]);
-  (0, import_react2.useEffect)(() => {
+  (0, import_react4.useEffect)(() => {
     sendCursorPosition(isSlateFocused);
   }, [editor, isSlateFocused, sendCursorPosition]);
 }
 
 // src/hooks/useRemoteCursorOverlayPositions.tsx
-var import_react4 = require("react");
+var import_react6 = require("react");
 
 // src/utils/getOverlayPosition.ts
 var import_slate2 = require("slate");
@@ -321,19 +334,19 @@ function getOverlayPosition(editor, range, { yOffset, xOffset, shouldGenerateOve
 }
 
 // src/hooks/utils.ts
-var import_react3 = require("react");
+var import_react5 = require("react");
 function useRequestRerender() {
-  const [, rerender] = (0, import_react3.useReducer)((s) => s + 1, 0);
-  const animationFrameIdRef = (0, import_react3.useRef)(null);
+  const [, rerender] = (0, import_react5.useReducer)((s) => s + 1, 0);
+  const animationFrameIdRef = (0, import_react5.useRef)(null);
   const clearAnimationFrame = () => {
     if (animationFrameIdRef.current) {
       cancelAnimationFrame(animationFrameIdRef.current);
       animationFrameIdRef.current = 0;
     }
   };
-  (0, import_react3.useEffect)(clearAnimationFrame);
-  (0, import_react3.useEffect)(() => clearAnimationFrame, []);
-  return (0, import_react3.useCallback)((immediately = false) => {
+  (0, import_react5.useEffect)(clearAnimationFrame);
+  (0, import_react5.useEffect)(() => clearAnimationFrame, []);
+  return (0, import_react5.useCallback)((immediately = false) => {
     if (immediately) {
       rerender();
       return;
@@ -345,12 +358,12 @@ function useRequestRerender() {
   }, []);
 }
 function useOnResize(ref, onResize) {
-  const onResizeRef = (0, import_react3.useRef)(onResize);
+  const onResizeRef = (0, import_react5.useRef)(onResize);
   onResizeRef.current = onResize;
-  const [observer] = (0, import_react3.useState)(() => new ResizeObserver(() => {
+  const [observer] = (0, import_react5.useState)(() => new ResizeObserver(() => {
     onResizeRef.current();
   }));
-  (0, import_react3.useEffect)(() => {
+  (0, import_react5.useEffect)(() => {
     if (!(ref == null ? void 0 : ref.current)) {
       return;
     }
@@ -374,14 +387,14 @@ function useRemoteCursorOverlayPositions(_a = {}) {
   const editor = useRemoteCursorEditor();
   const cursorStates = useRemoteCursorStates();
   const requestRerender = useRequestRerender();
-  const overlayPositionCache = (0, import_react4.useRef)(/* @__PURE__ */ new WeakMap());
-  const [overlayPositions, setOverlayPositions] = (0, import_react4.useState)({});
+  const overlayPositionCache = (0, import_react6.useRef)(/* @__PURE__ */ new WeakMap());
+  const [overlayPositions, setOverlayPositions] = (0, import_react6.useState)({});
   const refreshOnResize = "refreshOnResize" in opts ? (_a2 = opts.refreshOnResize) != null ? _a2 : true : true;
   useOnResize(refreshOnResize ? containerRef : void 0, () => {
     overlayPositionCache.current = /* @__PURE__ */ new WeakMap();
     requestRerender(refreshOnResize !== "debounced");
   });
-  (0, import_react4.useLayoutEffect)(() => {
+  (0, import_react6.useLayoutEffect)(() => {
     var _a3, _b2, _c;
     if (containerRef && !containerRef.current) {
       return;
@@ -412,7 +425,7 @@ function useRemoteCursorOverlayPositions(_a = {}) {
       setOverlayPositions(updated);
     }
   });
-  const overlayData = (0, import_react4.useMemo)(() => Object.entries(cursorStates).map(([clientId, state]) => {
+  const overlayData = (0, import_react6.useMemo)(() => Object.entries(cursorStates).map(([clientId, state]) => {
     var _a3, _b2;
     const range = state.relativeSelection && getCursorRange(editor, state);
     const overlayPosition = overlayPositions[clientId];
@@ -422,7 +435,7 @@ function useRemoteCursorOverlayPositions(_a = {}) {
       selectionRects: (_b2 = overlayPosition == null ? void 0 : overlayPosition.selectionRects) != null ? _b2 : FROZEN_EMPTY_ARRAY
     });
   }), [cursorStates, editor, overlayPositions]);
-  const refresh = (0, import_react4.useCallback)(() => {
+  const refresh = (0, import_react6.useCallback)(() => {
     overlayPositionCache.current = /* @__PURE__ */ new WeakMap();
     requestRerender(true);
   }, [requestRerender]);

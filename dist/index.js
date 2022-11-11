@@ -31,7 +31,7 @@ var __objRest = (source, exclude) => {
 };
 
 // src/hooks/useDecorateRemoteCursors.ts
-import { useCallback, useRef } from "react";
+import { useCallback as useCallback2, useRef } from "react";
 import { Range } from "slate";
 
 // src/utils/getCursorRange.ts
@@ -68,8 +68,7 @@ function useRemoteCursorEditor() {
 }
 
 // src/hooks/useRemoteCursorStates.ts
-import { useSyncExternalStore } from "use-sync-external-store/shim";
-import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
+import { useCallback } from "react";
 
 // src/hooks/useRemoteCursorStateStore.ts
 import {
@@ -133,14 +132,28 @@ function useRemoteCursorStateStore() {
   return getCursorStateStore(editor);
 }
 
+// src/hooks/useStore.ts
+import { useState, useEffect } from "react";
+function useStore(store, selector) {
+  const [subscribe, getSnapshot] = store;
+  const [state, setState] = useState(() => selector(getSnapshot()));
+  useEffect(() => {
+    const callback = () => setState(selector(getSnapshot()));
+    const unsubscribe = subscribe(callback);
+    callback();
+    return unsubscribe;
+  }, [subscribe, getSnapshot, selector]);
+  return state;
+}
+
 // src/hooks/useRemoteCursorStates.ts
 function useRemoteCursorStates() {
-  const [subscribe, getSnapshot] = useRemoteCursorStateStore();
-  return useSyncExternalStore(subscribe, getSnapshot);
+  const store = useRemoteCursorStateStore();
+  return useStore(store, useCallback((cursors) => cursors, []));
 }
-function useRemoteCursorStatesSelector(selector, isEqual) {
-  const [subscribe, getSnapshot] = useRemoteCursorStateStore();
-  return useSyncExternalStoreWithSelector(subscribe, getSnapshot, null, selector, isEqual);
+function useRemoteCursorStatesSelector(selector) {
+  const store = useRemoteCursorStateStore();
+  return useStore(store, selector);
 }
 
 // src/hooks/useDecorateRemoteCursors.ts
@@ -168,7 +181,7 @@ function useDecorateRemoteCursors({ carets = true } = {}) {
   const cursors = useRemoteCursorStates();
   const cursorsRef = useRef(cursors);
   cursorsRef.current = cursors;
-  return useCallback((entry) => {
+  return useCallback2((entry) => {
     const [, path] = entry;
     if (path.length !== 0) {
       return [];
@@ -194,12 +207,12 @@ function useDecorateRemoteCursors({ carets = true } = {}) {
 
 // src/hooks/useUnsetCursorPositionOnBlur.ts
 import { CursorEditor as CursorEditor4 } from "@slate-yjs/core";
-import { useCallback as useCallback2, useEffect } from "react";
+import { useCallback as useCallback3, useEffect as useEffect2 } from "react";
 import { useFocused } from "slate-react";
 function useUnsetCursorPositionOnBlur() {
   const editor = useRemoteCursorEditor();
   const isSlateFocused = useFocused();
-  const sendCursorPosition = useCallback2((isFocused) => {
+  const sendCursorPosition = useCallback3((isFocused) => {
     if (isFocused && editor.selection) {
       CursorEditor4.sendCursorPosition(editor, editor.selection);
       return;
@@ -208,7 +221,7 @@ function useUnsetCursorPositionOnBlur() {
       CursorEditor4.sendCursorPosition(editor, null);
     }
   }, [editor]);
-  useEffect(() => {
+  useEffect2(() => {
     const handleWindowBlur = () => {
       if (isSlateFocused) {
         sendCursorPosition(false);
@@ -226,18 +239,18 @@ function useUnsetCursorPositionOnBlur() {
       window.removeEventListener("focus", handleWindowFocus);
     };
   }, [isSlateFocused, sendCursorPosition]);
-  useEffect(() => {
+  useEffect2(() => {
     sendCursorPosition(isSlateFocused);
   }, [editor, isSlateFocused, sendCursorPosition]);
 }
 
 // src/hooks/useRemoteCursorOverlayPositions.tsx
 import {
-  useCallback as useCallback4,
+  useCallback as useCallback5,
   useLayoutEffect,
   useMemo,
   useRef as useRef3,
-  useState as useState2
+  useState as useState3
 } from "react";
 
 // src/utils/getOverlayPosition.ts
@@ -303,11 +316,11 @@ function getOverlayPosition(editor, range, { yOffset, xOffset, shouldGenerateOve
 
 // src/hooks/utils.ts
 import {
-  useCallback as useCallback3,
-  useEffect as useEffect2,
+  useCallback as useCallback4,
+  useEffect as useEffect3,
   useReducer,
   useRef as useRef2,
-  useState
+  useState as useState2
 } from "react";
 function useRequestRerender() {
   const [, rerender] = useReducer((s) => s + 1, 0);
@@ -318,9 +331,9 @@ function useRequestRerender() {
       animationFrameIdRef.current = 0;
     }
   };
-  useEffect2(clearAnimationFrame);
-  useEffect2(() => clearAnimationFrame, []);
-  return useCallback3((immediately = false) => {
+  useEffect3(clearAnimationFrame);
+  useEffect3(() => clearAnimationFrame, []);
+  return useCallback4((immediately = false) => {
     if (immediately) {
       rerender();
       return;
@@ -334,10 +347,10 @@ function useRequestRerender() {
 function useOnResize(ref, onResize) {
   const onResizeRef = useRef2(onResize);
   onResizeRef.current = onResize;
-  const [observer] = useState(() => new ResizeObserver(() => {
+  const [observer] = useState2(() => new ResizeObserver(() => {
     onResizeRef.current();
   }));
-  useEffect2(() => {
+  useEffect3(() => {
     if (!(ref == null ? void 0 : ref.current)) {
       return;
     }
@@ -362,7 +375,7 @@ function useRemoteCursorOverlayPositions(_a = {}) {
   const cursorStates = useRemoteCursorStates();
   const requestRerender = useRequestRerender();
   const overlayPositionCache = useRef3(/* @__PURE__ */ new WeakMap());
-  const [overlayPositions, setOverlayPositions] = useState2({});
+  const [overlayPositions, setOverlayPositions] = useState3({});
   const refreshOnResize = "refreshOnResize" in opts ? (_a2 = opts.refreshOnResize) != null ? _a2 : true : true;
   useOnResize(refreshOnResize ? containerRef : void 0, () => {
     overlayPositionCache.current = /* @__PURE__ */ new WeakMap();
@@ -409,7 +422,7 @@ function useRemoteCursorOverlayPositions(_a = {}) {
       selectionRects: (_b2 = overlayPosition == null ? void 0 : overlayPosition.selectionRects) != null ? _b2 : FROZEN_EMPTY_ARRAY
     });
   }), [cursorStates, editor, overlayPositions]);
-  const refresh = useCallback4(() => {
+  const refresh = useCallback5(() => {
     overlayPositionCache.current = /* @__PURE__ */ new WeakMap();
     requestRerender(true);
   }, [requestRerender]);

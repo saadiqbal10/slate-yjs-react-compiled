@@ -1075,7 +1075,7 @@ var SlateYjsReact = (() => {
             }
             return dispatcher.useContext(Context, unstable_observedBits);
           }
-          function useState4(initialState) {
+          function useState5(initialState) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useState(initialState);
           }
@@ -1087,7 +1087,7 @@ var SlateYjsReact = (() => {
             var dispatcher = resolveDispatcher();
             return dispatcher.useRef(initialValue);
           }
-          function useEffect4(create8, deps) {
+          function useEffect5(create8, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useEffect(create8, deps);
           }
@@ -1095,7 +1095,7 @@ var SlateYjsReact = (() => {
             var dispatcher = resolveDispatcher();
             return dispatcher.useLayoutEffect(create8, deps);
           }
-          function useCallback6(callback, deps) {
+          function useCallback7(callback, deps) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useCallback(callback, deps);
           }
@@ -1654,16 +1654,16 @@ var SlateYjsReact = (() => {
           exports.isValidElement = isValidElement;
           exports.lazy = lazy;
           exports.memo = memo;
-          exports.useCallback = useCallback6;
+          exports.useCallback = useCallback7;
           exports.useContext = useContext2;
           exports.useDebugValue = useDebugValue;
-          exports.useEffect = useEffect4;
+          exports.useEffect = useEffect5;
           exports.useImperativeHandle = useImperativeHandle;
           exports.useLayoutEffect = useLayoutEffect3;
           exports.useMemo = useMemo3;
           exports.useReducer = useReducer3;
           exports.useRef = useRef5;
-          exports.useState = useState4;
+          exports.useState = useState5;
           exports.version = ReactVersion;
         })();
       }
@@ -20976,242 +20976,6 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
     }
   });
 
-  // ../../node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js
-  var require_use_sync_external_store_shim_development = __commonJS({
-    "../../node_modules/use-sync-external-store/cjs/use-sync-external-store-shim.development.js"(exports) {
-      "use strict";
-      if (true) {
-        (function() {
-          "use strict";
-          if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
-            __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
-          }
-          var React2 = require_react();
-          var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
-          function error(format) {
-            {
-              {
-                for (var _len2 = arguments.length, args2 = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-                  args2[_key2 - 1] = arguments[_key2];
-                }
-                printWarning("error", format, args2);
-              }
-            }
-          }
-          function printWarning(level, format, args2) {
-            {
-              var ReactDebugCurrentFrame = ReactSharedInternals.ReactDebugCurrentFrame;
-              var stack = ReactDebugCurrentFrame.getStackAddendum();
-              if (stack !== "") {
-                format += "%s";
-                args2 = args2.concat([stack]);
-              }
-              var argsWithFormat = args2.map(function(item) {
-                return String(item);
-              });
-              argsWithFormat.unshift("Warning: " + format);
-              Function.prototype.apply.call(console[level], console, argsWithFormat);
-            }
-          }
-          function is(x2, y2) {
-            return x2 === y2 && (x2 !== 0 || 1 / x2 === 1 / y2) || x2 !== x2 && y2 !== y2;
-          }
-          var objectIs = typeof Object.is === "function" ? Object.is : is;
-          var useState4 = React2.useState, useEffect4 = React2.useEffect, useLayoutEffect3 = React2.useLayoutEffect, useDebugValue = React2.useDebugValue;
-          var didWarnOld18Alpha = false;
-          var didWarnUncachedGetSnapshot = false;
-          function useSyncExternalStore2(subscribe, getSnapshot, getServerSnapshot) {
-            {
-              if (!didWarnOld18Alpha) {
-                if (React2.startTransition !== void 0) {
-                  didWarnOld18Alpha = true;
-                  error("You are using an outdated, pre-release alpha of React 18 that does not support useSyncExternalStore. The use-sync-external-store shim will not work correctly. Upgrade to a newer pre-release.");
-                }
-              }
-            }
-            var value = getSnapshot();
-            {
-              if (!didWarnUncachedGetSnapshot) {
-                var cachedValue = getSnapshot();
-                if (!objectIs(value, cachedValue)) {
-                  error("The result of getSnapshot should be cached to avoid an infinite loop");
-                  didWarnUncachedGetSnapshot = true;
-                }
-              }
-            }
-            var _useState = useState4({
-              inst: {
-                value,
-                getSnapshot
-              }
-            }), inst = _useState[0].inst, forceUpdate = _useState[1];
-            useLayoutEffect3(function() {
-              inst.value = value;
-              inst.getSnapshot = getSnapshot;
-              if (checkIfSnapshotChanged(inst)) {
-                forceUpdate({
-                  inst
-                });
-              }
-            }, [subscribe, value, getSnapshot]);
-            useEffect4(function() {
-              if (checkIfSnapshotChanged(inst)) {
-                forceUpdate({
-                  inst
-                });
-              }
-              var handleStoreChange = function() {
-                if (checkIfSnapshotChanged(inst)) {
-                  forceUpdate({
-                    inst
-                  });
-                }
-              };
-              return subscribe(handleStoreChange);
-            }, [subscribe]);
-            useDebugValue(value);
-            return value;
-          }
-          function checkIfSnapshotChanged(inst) {
-            var latestGetSnapshot = inst.getSnapshot;
-            var prevValue = inst.value;
-            try {
-              var nextValue = latestGetSnapshot();
-              return !objectIs(prevValue, nextValue);
-            } catch (error2) {
-              return true;
-            }
-          }
-          function useSyncExternalStore$1(subscribe, getSnapshot, getServerSnapshot) {
-            return getSnapshot();
-          }
-          var canUseDOM = !!(typeof window !== "undefined" && typeof window.document !== "undefined" && typeof window.document.createElement !== "undefined");
-          var isServerEnvironment = !canUseDOM;
-          var shim = isServerEnvironment ? useSyncExternalStore$1 : useSyncExternalStore2;
-          var useSyncExternalStore$2 = React2.useSyncExternalStore !== void 0 ? React2.useSyncExternalStore : shim;
-          exports.useSyncExternalStore = useSyncExternalStore$2;
-          if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop === "function") {
-            __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(new Error());
-          }
-        })();
-      }
-    }
-  });
-
-  // ../../node_modules/use-sync-external-store/shim/index.js
-  var require_shim = __commonJS({
-    "../../node_modules/use-sync-external-store/shim/index.js"(exports, module) {
-      "use strict";
-      if (false) {
-        module.exports = null;
-      } else {
-        module.exports = require_use_sync_external_store_shim_development();
-      }
-    }
-  });
-
-  // ../../node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js
-  var require_with_selector_development = __commonJS({
-    "../../node_modules/use-sync-external-store/cjs/use-sync-external-store-shim/with-selector.development.js"(exports) {
-      "use strict";
-      if (true) {
-        (function() {
-          "use strict";
-          if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
-            __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
-          }
-          var React2 = require_react();
-          var shim = require_shim();
-          function is(x2, y2) {
-            return x2 === y2 && (x2 !== 0 || 1 / x2 === 1 / y2) || x2 !== x2 && y2 !== y2;
-          }
-          var objectIs = typeof Object.is === "function" ? Object.is : is;
-          var useSyncExternalStore2 = shim.useSyncExternalStore;
-          var useRef5 = React2.useRef, useEffect4 = React2.useEffect, useMemo3 = React2.useMemo, useDebugValue = React2.useDebugValue;
-          function useSyncExternalStoreWithSelector2(subscribe, getSnapshot, getServerSnapshot, selector, isEqual) {
-            var instRef = useRef5(null);
-            var inst;
-            if (instRef.current === null) {
-              inst = {
-                hasValue: false,
-                value: null
-              };
-              instRef.current = inst;
-            } else {
-              inst = instRef.current;
-            }
-            var _useMemo = useMemo3(function() {
-              var hasMemo = false;
-              var memoizedSnapshot;
-              var memoizedSelection;
-              var memoizedSelector = function(nextSnapshot) {
-                if (!hasMemo) {
-                  hasMemo = true;
-                  memoizedSnapshot = nextSnapshot;
-                  var _nextSelection = selector(nextSnapshot);
-                  if (isEqual !== void 0) {
-                    if (inst.hasValue) {
-                      var currentSelection = inst.value;
-                      if (isEqual(currentSelection, _nextSelection)) {
-                        memoizedSelection = currentSelection;
-                        return currentSelection;
-                      }
-                    }
-                  }
-                  memoizedSelection = _nextSelection;
-                  return _nextSelection;
-                }
-                var prevSnapshot = memoizedSnapshot;
-                var prevSelection = memoizedSelection;
-                if (objectIs(prevSnapshot, nextSnapshot)) {
-                  return prevSelection;
-                }
-                var nextSelection = selector(nextSnapshot);
-                if (isEqual !== void 0 && isEqual(prevSelection, nextSelection)) {
-                  return prevSelection;
-                }
-                memoizedSnapshot = nextSnapshot;
-                memoizedSelection = nextSelection;
-                return nextSelection;
-              };
-              var maybeGetServerSnapshot = getServerSnapshot === void 0 ? null : getServerSnapshot;
-              var getSnapshotWithSelector = function() {
-                return memoizedSelector(getSnapshot());
-              };
-              var getServerSnapshotWithSelector = maybeGetServerSnapshot === null ? void 0 : function() {
-                return memoizedSelector(maybeGetServerSnapshot());
-              };
-              return [getSnapshotWithSelector, getServerSnapshotWithSelector];
-            }, [getSnapshot, getServerSnapshot, selector, isEqual]), getSelection = _useMemo[0], getServerSelection = _useMemo[1];
-            var value = useSyncExternalStore2(subscribe, getSelection, getServerSelection);
-            useEffect4(function() {
-              inst.hasValue = true;
-              inst.value = value;
-            }, [value]);
-            useDebugValue(value);
-            return value;
-          }
-          exports.useSyncExternalStoreWithSelector = useSyncExternalStoreWithSelector2;
-          if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop === "function") {
-            __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStop(new Error());
-          }
-        })();
-      }
-    }
-  });
-
-  // ../../node_modules/use-sync-external-store/shim/with-selector.js
-  var require_with_selector = __commonJS({
-    "../../node_modules/use-sync-external-store/shim/with-selector.js"(exports, module) {
-      "use strict";
-      if (false) {
-        module.exports = null;
-      } else {
-        module.exports = require_with_selector_development();
-      }
-    }
-  });
-
   // src/index.ts
   var src_exports = {};
   __export(src_exports, {
@@ -21226,7 +20990,7 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
   });
 
   // src/hooks/useDecorateRemoteCursors.ts
-  var import_react2 = __toESM(require_react(), 1);
+  var import_react4 = __toESM(require_react(), 1);
 
   // ../../node_modules/is-plain-object/dist/is-plain-object.mjs
   function isObject(o2) {
@@ -31441,8 +31205,7 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
   }
 
   // src/hooks/useRemoteCursorStates.ts
-  var import_shim = __toESM(require_shim(), 1);
-  var import_with_selector = __toESM(require_with_selector(), 1);
+  var import_react3 = __toESM(require_react(), 1);
 
   // src/hooks/useRemoteCursorStateStore.ts
   var EDITOR_TO_CURSOR_STORE = /* @__PURE__ */ new WeakMap();
@@ -31503,14 +31266,28 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
     return getCursorStateStore(editor);
   }
 
+  // src/hooks/useStore.ts
+  var import_react2 = __toESM(require_react(), 1);
+  function useStore(store, selector) {
+    const [subscribe, getSnapshot] = store;
+    const [state, setState] = (0, import_react2.useState)(() => selector(getSnapshot()));
+    (0, import_react2.useEffect)(() => {
+      const callback = () => setState(selector(getSnapshot()));
+      const unsubscribe = subscribe(callback);
+      callback();
+      return unsubscribe;
+    }, [subscribe, getSnapshot, selector]);
+    return state;
+  }
+
   // src/hooks/useRemoteCursorStates.ts
   function useRemoteCursorStates() {
-    const [subscribe, getSnapshot] = useRemoteCursorStateStore();
-    return (0, import_shim.useSyncExternalStore)(subscribe, getSnapshot);
+    const store = useRemoteCursorStateStore();
+    return useStore(store, (0, import_react3.useCallback)((cursors) => cursors, []));
   }
-  function useRemoteCursorStatesSelector(selector, isEqual) {
-    const [subscribe, getSnapshot] = useRemoteCursorStateStore();
-    return (0, import_with_selector.useSyncExternalStoreWithSelector)(subscribe, getSnapshot, null, selector, isEqual);
+  function useRemoteCursorStatesSelector(selector) {
+    const store = useRemoteCursorStateStore();
+    return useStore(store, selector);
   }
 
   // src/hooks/useDecorateRemoteCursors.ts
@@ -31536,9 +31313,9 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
   function useDecorateRemoteCursors({ carets = true } = {}) {
     const editor = useRemoteCursorEditor();
     const cursors = useRemoteCursorStates();
-    const cursorsRef = (0, import_react2.useRef)(cursors);
+    const cursorsRef = (0, import_react4.useRef)(cursors);
     cursorsRef.current = cursors;
-    return (0, import_react2.useCallback)((entry) => {
+    return (0, import_react4.useCallback)((entry) => {
       const [, path] = entry;
       if (path.length !== 0) {
         return [];
@@ -31563,11 +31340,11 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
   }
 
   // src/hooks/useUnsetCursorPositionOnBlur.ts
-  var import_react3 = __toESM(require_react(), 1);
+  var import_react5 = __toESM(require_react(), 1);
   function useUnsetCursorPositionOnBlur() {
     const editor = useRemoteCursorEditor();
     const isSlateFocused = useFocused();
-    const sendCursorPosition = (0, import_react3.useCallback)((isFocused) => {
+    const sendCursorPosition = (0, import_react5.useCallback)((isFocused) => {
       if (isFocused && editor.selection) {
         CursorEditor.sendCursorPosition(editor, editor.selection);
         return;
@@ -31576,7 +31353,7 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
         CursorEditor.sendCursorPosition(editor, null);
       }
     }, [editor]);
-    (0, import_react3.useEffect)(() => {
+    (0, import_react5.useEffect)(() => {
       const handleWindowBlur = () => {
         if (isSlateFocused) {
           sendCursorPosition(false);
@@ -31594,13 +31371,13 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
         window.removeEventListener("focus", handleWindowFocus);
       };
     }, [isSlateFocused, sendCursorPosition]);
-    (0, import_react3.useEffect)(() => {
+    (0, import_react5.useEffect)(() => {
       sendCursorPosition(isSlateFocused);
     }, [editor, isSlateFocused, sendCursorPosition]);
   }
 
   // src/hooks/useRemoteCursorOverlayPositions.tsx
-  var import_react5 = __toESM(require_react(), 1);
+  var import_react7 = __toESM(require_react(), 1);
 
   // src/utils/getOverlayPosition.ts
   function getOverlayPosition(editor, range, { yOffset, xOffset, shouldGenerateOverlay }) {
@@ -31662,19 +31439,19 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
   }
 
   // src/hooks/utils.ts
-  var import_react4 = __toESM(require_react(), 1);
+  var import_react6 = __toESM(require_react(), 1);
   function useRequestRerender() {
-    const [, rerender] = (0, import_react4.useReducer)((s2) => s2 + 1, 0);
-    const animationFrameIdRef = (0, import_react4.useRef)(null);
+    const [, rerender] = (0, import_react6.useReducer)((s2) => s2 + 1, 0);
+    const animationFrameIdRef = (0, import_react6.useRef)(null);
     const clearAnimationFrame = () => {
       if (animationFrameIdRef.current) {
         cancelAnimationFrame(animationFrameIdRef.current);
         animationFrameIdRef.current = 0;
       }
     };
-    (0, import_react4.useEffect)(clearAnimationFrame);
-    (0, import_react4.useEffect)(() => clearAnimationFrame, []);
-    return (0, import_react4.useCallback)((immediately = false) => {
+    (0, import_react6.useEffect)(clearAnimationFrame);
+    (0, import_react6.useEffect)(() => clearAnimationFrame, []);
+    return (0, import_react6.useCallback)((immediately = false) => {
       if (immediately) {
         rerender();
         return;
@@ -31686,12 +31463,12 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
     }, []);
   }
   function useOnResize(ref, onResize) {
-    const onResizeRef = (0, import_react4.useRef)(onResize);
+    const onResizeRef = (0, import_react6.useRef)(onResize);
     onResizeRef.current = onResize;
-    const [observer] = (0, import_react4.useState)(() => new ResizeObserver(() => {
+    const [observer] = (0, import_react6.useState)(() => new ResizeObserver(() => {
       onResizeRef.current();
     }));
-    (0, import_react4.useEffect)(() => {
+    (0, import_react6.useEffect)(() => {
       if (!(ref == null ? void 0 : ref.current)) {
         return;
       }
@@ -31715,14 +31492,14 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
     const editor = useRemoteCursorEditor();
     const cursorStates = useRemoteCursorStates();
     const requestRerender = useRequestRerender();
-    const overlayPositionCache = (0, import_react5.useRef)(/* @__PURE__ */ new WeakMap());
-    const [overlayPositions, setOverlayPositions] = (0, import_react5.useState)({});
+    const overlayPositionCache = (0, import_react7.useRef)(/* @__PURE__ */ new WeakMap());
+    const [overlayPositions, setOverlayPositions] = (0, import_react7.useState)({});
     const refreshOnResize = "refreshOnResize" in opts ? (_a2 = opts.refreshOnResize) != null ? _a2 : true : true;
     useOnResize(refreshOnResize ? containerRef : void 0, () => {
       overlayPositionCache.current = /* @__PURE__ */ new WeakMap();
       requestRerender(refreshOnResize !== "debounced");
     });
-    (0, import_react5.useLayoutEffect)(() => {
+    (0, import_react7.useLayoutEffect)(() => {
       var _a3, _b2, _c;
       if (containerRef && !containerRef.current) {
         return;
@@ -31753,7 +31530,7 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
         setOverlayPositions(updated);
       }
     });
-    const overlayData = (0, import_react5.useMemo)(() => Object.entries(cursorStates).map(([clientId, state]) => {
+    const overlayData = (0, import_react7.useMemo)(() => Object.entries(cursorStates).map(([clientId, state]) => {
       var _a3, _b2;
       const range = state.relativeSelection && getCursorRange(editor, state);
       const overlayPosition = overlayPositions[clientId];
@@ -31763,7 +31540,7 @@ For more info, visit https://reactjs.org/link/mock-scheduler`);
         selectionRects: (_b2 = overlayPosition == null ? void 0 : overlayPosition.selectionRects) != null ? _b2 : FROZEN_EMPTY_ARRAY
       });
     }), [cursorStates, editor, overlayPositions]);
-    const refresh = (0, import_react5.useCallback)(() => {
+    const refresh = (0, import_react7.useCallback)(() => {
       overlayPositionCache.current = /* @__PURE__ */ new WeakMap();
       requestRerender(true);
     }, [requestRerender]);
@@ -31781,24 +31558,6 @@ object-assign
  *
  * Copyright (c) 2014-2017, Jon Schlinkert.
  * Released under the MIT License.
- */
-/**
- * @license React
- * use-sync-external-store-shim.development.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-/**
- * @license React
- * use-sync-external-store-shim/with-selector.development.js
- *
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
  */
 /**
  * Checks if an event is supported in the current execution environment.
